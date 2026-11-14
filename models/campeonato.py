@@ -1,17 +1,21 @@
 class Campeonato:
-    def __init__(self, nome, equipes, partidas):
-        self.nome = nome
-        self.equipes = equipes
-        self.partidas = partidas
+    def __init__(self, nome):
+        nome_campeonato = nome.strip()
+        if not nome_campeonato:
+            raise ValueError("O nome do campeonato não pode ser vazio.")
+        self._nome = nome_campeonato
+        self._equipes = []
+        self._partidas = []
 
-    def adicionar_equipe(self, equipe):
-        self.equipes.append(equipe)
+    @property
+    def nome(self):
+        return self._nome
 
-    def adicionar_partida(self, partida):
-        self.partidas.append(partida)
+    @property
+    def equipes(self):
+        return list(self._equipes)
 
-    def remover_equipe(self, equipe):
-        self.equipes.remove(equipe)
-
-    def remover_partida(self, partida):
-        self.partidas.remove(partida)
+    @property
+    def partidas(self):
+        return list(self._partidas)
+    
