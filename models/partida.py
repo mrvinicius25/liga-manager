@@ -1,11 +1,12 @@
 
-from equipe import Equipe
+from models.equipe import Equipe
 
 
 class Partida:
     def __init__(self, equipe_casa, equipe_visitante, rodada,
                  gols_casa=None, gols_visitante=None):
-
+        if equipe_casa == equipe_visitante:
+            raise ValueError("As equipes da casa e visitante devem ser diferentes.")
         self._equipe_casa = equipe_casa
         self._equipe_visitante = equipe_visitante
         self._rodada = rodada
@@ -43,7 +44,7 @@ class Partida:
     def registrar_resultado(self, gols_casa, gols_visitante):
 
         if type(gols_casa) is not int or type(gols_visitante) is not int:
-            raise ValueError("Os gols devem ser números inteiros.")
+            raise ValueError("Informe os gols das duas equipes.")
 
         if gols_casa < 0 or gols_visitante < 0:
             raise ValueError("Os gols não podem ser negativos.")
@@ -118,3 +119,4 @@ class Partida:
             f"{self._equipe_visitante.nome} "
             f"(Rodada {self._rodada})"
         )
+
