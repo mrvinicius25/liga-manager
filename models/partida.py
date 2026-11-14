@@ -42,9 +42,12 @@ class Partida:
     # ---------- REGISTRAR RESULTADO ----------
 
     def registrar_resultado(self, gols_casa, gols_visitante):
-
-        if type(gols_casa) is not int or type(gols_visitante) is not int:
+        # 1 - Verifica se algum valor está falatando
+        if gols_casa is None or gols_visitante is None:
             raise ValueError("Informe os gols das duas equipes.")
+        
+        if type(gols_casa) is not int or type(gols_visitante) is not int:
+            raise ValueError("Os gols devem ser números inteiros.")
 
         if gols_casa < 0 or gols_visitante < 0:
             raise ValueError("Os gols não podem ser negativos.")

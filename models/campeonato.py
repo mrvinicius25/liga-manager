@@ -46,8 +46,8 @@ class Campeonato:
         
         for partida in self._partidas:
             if partida.envolve(equipe):
-                raise ValueError(f"A equipe está vinculada a partida e não pode ser removida.")
-            self._equipes.remove(equipe)
+                raise ValueError(f"A equipe '{equipe.nome}' está vinculada a partida e não pode ser removida.")
+        self._equipes.remove(equipe)
 
     def adicionar_partida(self, equipe_casa, equipe_visitante, rodada, gols_casa=None, gols_visitante=None):
         if equipe_casa not in self._equipes or equipe_visitante not in self._equipes:
@@ -55,4 +55,21 @@ class Campeonato:
         partida = Partida(equipe_casa, equipe_visitante, rodada, gols_casa, gols_visitante)
         self._partidas.append(partida)
         return partida
-            
+
+    def quantidade_partidas(self):
+        return len(self._partidas)
+
+    def partidas_realizadas(self):
+        cont = 0
+        for partida in self._partidas:
+            if partida.foi_jogada():
+                cont += 1
+        return cont
+    
+    def partidas_pendentes(self):
+        cont = 0
+        for partida in self._partidas:
+            if not partida.foi_jogada():
+                cont += 1
+        return cont
+    
