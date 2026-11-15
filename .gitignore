@@ -1,4 +1,5 @@
 #cache do python
 __pycache__/
 
+# dados gerados pelo programa (cada um tem o seu campeonato)
 data/
