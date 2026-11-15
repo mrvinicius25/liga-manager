@@ -42,7 +42,7 @@ class Partida:
     # ---------- REGISTRAR RESULTADO ----------
 
     def registrar_resultado(self, gols_casa, gols_visitante):
-        # 1 - Verifica se algum valor está falatando
+        # 1 - Verifica se algum valor está faltando
         if gols_casa is None or gols_visitante is None:
             raise ValueError("Informe os gols das duas equipes.")
         
@@ -122,4 +122,3 @@ class Partida:
             f"{self._equipe_visitante.nome} "
             f"(Rodada {self._rodada})"
         )
-

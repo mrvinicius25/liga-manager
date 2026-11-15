@@ -9,7 +9,7 @@
 
 # 1. Visão geral
 
-O **LigaManager** é um aplicativo desktop simples, desenvolvido em Python com Tkinter, para gerenciar um campeonato de futebol em turno único.
+O **LigaManager** é um aplicativo desktop simples, desenvolvido em Python com CustomTkinter (biblioteca construída sobre o Tkinter), para gerenciar um campeonato de futebol em turno único.
 
 O sistema permitirá cadastrar equipes, organizar os confrontos, registrar resultados e acompanhar automaticamente a classificação.
 
@@ -51,14 +51,29 @@ O projeto deve permanecer simples e concentrado nas funcionalidades essenciais.
 # 2. Tecnologias e execução
 
 - Linguagem: Python 3.
-- Interface gráfica: Tkinter e `tkinter.ttk`.
+- Interface gráfica: CustomTkinter (`customtkinter`), que é construída sobre o Tkinter.
+  - Componentes que não existem na CustomTkinter continuam vindo do Tkinter padrão: `ttk.Treeview` (tabelas, como a classificação) e `tkinter.messagebox` (mensagens de erro e confirmação).
 - Paradigma: Programação Orientada a Objetos.
-- Dependências externas: nenhuma prevista para a versão básica.
+- Dependências externas: somente `customtkinter`, com versão fixada no arquivo `requirements.txt`.
+
+**Decisão da equipe:** a troca de Tkinter puro para CustomTkinter foi acordada entre os integrantes. A apresentação será feita no computador do colega, onde a biblioteca já está instalada. O `requirements.txt` existe para permitir instalar o projeto em outro computador, se necessário.
+
+Instalação das dependências (uma vez por computador):
+
+```bash
+pip install -r requirements.txt
+```
 
 O programa deve ser executado a partir da pasta raiz:
 
 ```bash
 python main.py
+```
+
+Os testes automatizados são executados a partir da pasta raiz com:
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
 ---
@@ -70,6 +85,7 @@ Estrutura acordada no contrato da equipe:
 ```text
 LigaManager/
 ├── main.py
+├── requirements.txt          # dependências: customtkinter
 ├── data/
 │   └── campeonato.json       # criado automaticamente na primeira gravação
 ├── storage/
@@ -86,12 +102,17 @@ LigaManager/
     ├── equipes.py
     ├── partidas.py
     └── classificacao.py
+tests/
+    ├── test_campeonato.py
+    └── test_repositorio_json.py
 ```
 
 Responsabilidades:
 
 - `models/`: regras de negócio e entidades do sistema. Não deve importar Tkinter.
-- `views/`: interface gráfica. Deve chamar os métodos das classes de negócio, sem duplicar regras ou calcular pontos diretamente.
+- `views/`: interface gráfica com CustomTkinter. Deve chamar os métodos das classes de negócio, sem duplicar regras ou calcular pontos diretamente.
+- `storage/`: leitura e gravação do campeonato em JSON. Não deve importar CustomTkinter nem Tkinter.
+- `tests/`: testes automatizados com `unittest`, sem interface gráfica.
 - `main.py`: inicialização do aplicativo, criação do campeonato e navegação entre telas.
 
 Os imports devem partir da pasta raiz, por exemplo:
@@ -118,7 +139,7 @@ from views.inicio import TelaInicio
 | Janela principal e navegação (`App`) | Colega | `main.py` |
 | Tela inicial / Dashboard | Colega | `views/inicio.py` |
 | Tela independente de classificação | Colega | `views/classificacao.py` |
-| Persistência JSON | A combinar (sugestão: colega) | `storage/repositorio_json.py` |
+| Persistência JSON | Colega | `storage/repositorio_json.py` |
 
 A integração e os testes finais devem ser feitos em conjunto.
 
@@ -402,7 +423,7 @@ Esse método depende de `Equipe` e `Partida` implementarem exatamente os método
 
 **Arquivo sugerido:** `storage/repositorio_json.py`  
 **Arquivo de dados:** `data/campeonato.json`  
-**Responsável:** ainda deve ser confirmado entre os integrantes. Como o colega cuida da inicialização e integração, recomenda-se que ele implemente ou coordene esta parte.
+**Responsável:** colega (confirmado).
 
 O JSON deve armazenar os dados necessários para reconstruir o campeonato:
 - nome do campeonato;
@@ -463,14 +484,14 @@ O repositório deve cuidar somente da leitura e gravação. As regras do campeon
 
 ---
 
-# 8. Interface gráfica (`views/` e `main.py`)
+# 9. Interface gráfica (`views/` e `main.py`)
 
 ## 9.1 Janela principal e classe `App`
 
 **Arquivo:** `main.py`  
 **Responsável:** colega.
 
-A classe `App` deve herdar de `tk.Tk`, criar a janela principal, instanciar um único objeto `Campeonato` e controlar a navegação.
+A classe `App` deve herdar de `ctk.CTk` (a janela principal da CustomTkinter, que por sua vez herda de `tk.Tk`), criar a janela principal, instanciar um único objeto `Campeonato` e controlar a navegação.
 
 ### Interface pública obrigatória
 
@@ -490,7 +511,7 @@ Cada tela deve ter um método `atualizar()` para reler os dados do campeonato an
 ### Esqueleto de referência
 
 ```python
-import tkinter as tk
+import customtkinter as ctk
 
 from models.campeonato import Campeonato
 from storage.repositorio_json import RepositorioJSON
@@ -500,7 +521,7 @@ from views.partidas import TelaPartidas
 from views.classificacao import TelaClassificacao
 
 
-class App(tk.Tk):
+class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
@@ -513,7 +534,7 @@ class App(tk.Tk):
             self.campeonato = Campeonato("Campeonato da Turma")
             self.repositorio.salvar(self.campeonato)
 
-        container = tk.Frame(self)
+        container = ctk.CTkFrame(self)
         container.pack(fill="both", expand=True)
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
@@ -549,12 +570,15 @@ O esqueleto é uma referência de integração. Ajustes visuais podem ser feitos
 
 ## 9.2 Padrão das telas
 
-As telas devem herdar de `tk.Frame` ou de um componente `ttk.Frame`, receber `master` e `app` no construtor e manter uma referência a `app`.
+As telas devem ser **classes** que herdam de `ctk.CTkFrame`, recebem `master` e `app` no construtor e mantêm uma referência a `app`. Não devem ser funções, e não devem colocar componentes diretamente na janela principal nem alterar o título ou o tamanho dela: cada tela desenha seus componentes dentro de si mesma (`self`), para que a `App` possa empilhar as telas e exibir uma de cada vez com `tkraise()`.
 
 Padrão:
 
 ```python
-class TelaExemplo(tk.Frame):
+import customtkinter as ctk
+
+
+class TelaExemplo(ctk.CTkFrame):
     def __init__(self, master, app):
         super().__init__(master)
         self.app = app
@@ -566,6 +590,18 @@ class TelaExemplo(tk.Frame):
 ```
 
 As telas não devem manter cópias independentes das equipes e partidas. A fonte dos dados é `self.app.campeonato`.
+
+### Componentes sem equivalente na CustomTkinter
+
+A CustomTkinter não possui tabela, lista selecionável nem caixa de mensagem. Nesses casos, usar o Tkinter padrão dentro das telas CTk:
+
+| Necessidade | Componente | Onde é usado |
+|---|---|---|
+| Tabela com colunas | `ttk.Treeview` (com `ttk.Style` para combinar com o tema) | Classificação; opcionalmente equipes e partidas |
+| Mensagens de erro, sucesso e confirmação | `tkinter.messagebox` | Todas as telas |
+| Lista rolável de itens | `ctk.CTkScrollableFrame` ou `ttk.Treeview` | Equipes e partidas |
+
+Todas as telas devem usar a CustomTkinter como base, para manter o visual consistente.
 
 ---
 
@@ -690,7 +726,7 @@ Após cadastrar/remover equipe, gerar confrontos ou registrar um resultado, a te
 TelaClassificacao(master, app)
 ```
 
-A tela deve ter o método `atualizar()` e consultar `self.app.campeonato.calcular_classificacao()`. Deve exibir as colunas Pos, Equipe, PTS, J, V, E, D, GP, GC e SG. Pode usar `ttk.Treeview`.
+A tela deve ter o método `atualizar()` e consultar `self.app.campeonato.calcular_classificacao()`. Deve exibir as colunas Pos, Equipe, PTS, J, V, E, D, GP, GC e SG. Deve usar `ttk.Treeview` dentro da tela CTk, já que a CustomTkinter não possui componente de tabela; o visual do `Treeview` pode ser ajustado com `ttk.Style` para combinar com o tema.
 
 A tela apenas apresenta os dados. O cálculo pertence à classe `Campeonato`. Deve oferecer um botão para voltar ao Início e/ou navegar para as demais telas.
 
@@ -703,10 +739,12 @@ A tela apenas apresenta os dados. O cálculo pertence à classe `Campeonato`. De
 3. Nomes em português, sem acentos nos identificadores.
 4. Atributos internos iniciados por `_`.
 5. Propriedades públicas implementadas com `@property`.
-6. Classes de `models/` não importam Tkinter.
+6. Classes de `models/` e `storage/` não importam CustomTkinter nem Tkinter.
 7. As telas não duplicam regras de negócio.
 8. Erros de regra de negócio devem lançar `ValueError` com mensagens em português.
-9. As telas devem capturar `ValueError` e apresentar a mensagem com `messagebox.showerror`.
+9. As telas devem capturar `ValueError` e apresentar a mensagem com `messagebox.showerror` (de `tkinter.messagebox`).
+10. Interface com CustomTkinter: `import customtkinter as ctk`, janela `ctk.CTk`, telas `ctk.CTkFrame`. Componentes do Tkinter padrão só quando não houver equivalente na CustomTkinter (ver seção 9.2).
+11. Novas dependências externas devem ser combinadas entre os integrantes e registradas no `requirements.txt` com versão fixa.
 
 
 ---
@@ -721,8 +759,12 @@ As decisões abaixo já foram tomadas pela equipe:
 - [x] A classificação será recalculada a partir das partidas, zerando antes as estatísticas.
 - [x] Os dados serão persistidos em JSON.
 - [x] A classificação terá uma tela independente.
+- [x] A assinatura de `Partida` é `Partida(equipe_casa, equipe_visitante, rodada, gols_casa=None, gols_visitante=None)`.
+- [x] O colega implementará o `RepositorioJSON`.
+- [x] A interface usará CustomTkinter (`customtkinter==6.0.0`, registrada no `requirements.txt`), com `ttk.Treeview` e `tkinter.messagebox` onde a CustomTkinter não tiver equivalente.
+- [x] Todas as telas serão classes que herdam de `ctk.CTkFrame`, no padrão da seção 9.2.
 
-Ainda é necessário alinhar com Vitor a assinatura exata do construtor de `Partida`, incluindo a posição do parâmetro `rodada`, e confirmar quem implementará `RepositorioJSON`. Não alterem assinaturas compartilhadas sem atualizar o contrato.
+Não alterem assinaturas compartilhadas sem atualizar o contrato.
 
 ---
 
@@ -756,11 +798,11 @@ Testar pelo terminal:
 - recálculo repetido sem duplicação de estatísticas.
 
 ## Etapa 4 — Criar a persistência JSON e a janela principal
-- Implementar ou integrar `RepositorioJSON` em `storage/repositorio_json.py` (responsável a confirmar).
+- Implementar `RepositorioJSON` em `storage/repositorio_json.py`.
 - Criar/carregar um único objeto `Campeonato` na inicialização.
 - Salvar após operações que alterem os dados.
-- Implementar a classe `App` em `main.py`.
-- Criar o container de quatro telas.
+- Implementar a classe `App` em `main.py`, herdando de `ctk.CTk`.
+- Criar o container de quatro telas (telas provisórias podem ser usadas enquanto as telas de Vitor não estiverem no padrão da seção 9.2).
 - Implementar `mostrar_tela(nome)`.
 - Testar carregamento, gravação e navegação.
 
@@ -813,38 +855,7 @@ O projeto será considerado funcional quando os seguintes cenários forem atendi
 
 ---
 
-# 14. Orientações para usar o Claude Code como tutor de programação
-
-O objetivo é que o Claude Code ajude a desenvolver a parte do colega **lado a lado**, explicando o raciocínio e não apenas entregando arquivos prontos.
-
-Instruções sugeridas para o Claude Code:
-
-1. Leia este documento inteiro antes de sugerir alterações.
-2. Respeite a divisão de responsabilidades e a estrutura de pastas.
-3. Trabalhe principalmente nas partes atribuídas ao colega:
-   - `models/campeonato.py`;
-   - `main.py`;
-   - `views/inicio.py`;
-   - `views/classificacao.py`.
-   - `storage/repositorio_json.py`, somente após confirmar que essa responsabilidade ficará com o colega.
-4. Não implemente as partes atribuídas a Vitor, salvo se for necessário criar um mock temporário para testes. Não sobrescreva os arquivos dele.
-5. Antes de codificar, confira os arquivos que já existem no projeto. Não presuma que estejam vazios.
-6. Não altere silenciosamente o contrato das classes `Equipe` e `Partida`. Se encontrar incompatibilidade ou falta de método, explique o problema e proponha uma alteração para aprovação antes de modificar a interface.
-7. Desenvolva uma etapa por vez. Explique o que será feito, por que será feito e como testar.
-8. Prefira exemplos pequenos e código simples, adequado a um projeto acadêmico introdutório de POO.
-9. Não acrescente bibliotecas, banco de dados SQL, autenticação ou funcionalidades fora do escopo sem autorização. A persistência definida é JSON.
-10. Após cada etapa, execute ou proponha testes objetivos e explique os resultados.
-11. Preserve o código já existente. Não apague nem reescreva arquivos sem necessidade e sem explicar o motivo.
-12. Se houver mais de uma solução, apresente a opção mais simples e explique brevemente as alternativas.
-13. Ao terminar cada etapa, informe quais arquivos foram criados ou modificados, o que foi implementado e qual é o próximo passo.
-
-**Primeira solicitação ao Claude Code:**
-
-> Analise a estrutura atual do projeto e este documento. Não altere nenhum arquivo ainda. Primeiro, apresente um diagnóstico da estrutura existente, identifique o que já está implementado e aponte incompatibilidades com o contrato atualizado. Verifique especialmente a integração de `Campeonato` com `Equipe` e `Partida`, o atributo `rodada`, a geração de partidas pendentes, a tela independente de classificação e a persistência JSON. Não invente nem altere assinaturas compartilhadas sem sinalizar. Depois, proponha uma sequência de implementação da minha parte, começando pela classe `Campeonato`, para que possamos desenvolver e testar cada etapa juntos.
-
----
-
-# 15. Resumo da arquitetura
+# 14. Resumo da arquitetura
 
 ```text
 main.py
@@ -881,8 +892,10 @@ storage/repositorio_json.py
 
 ---
 
-# 16. Nota de sincronização entre os integrantes
+# 15. Nota de sincronização entre os integrantes
 
 Esta versão substitui a versão anterior da especificação. Ela registra as decisões confirmadas pela equipe nesta revisão: geração automática dos confrontos, partidas inicialmente pendentes, atributo `rodada`, persistência em JSON e tela independente de classificação.
+
+**Revisão de 15/11/2026:** a interface passou de Tkinter puro para CustomTkinter, com acordo dos dois integrantes. Foram atualizadas as seções 1, 2, 3, 4, 8, 9, 10, 11 e 12, e criado o arquivo `requirements.txt`. A responsabilidade pelo `RepositorioJSON` ficou com o colega, e a assinatura de `Partida` foi confirmada. As telas devem seguir o padrão de classe da seção 9.2.
 
 Antes de começar a implementação compartilhada, Vitor e o colega devem conferir se os arquivos `models/equipe.py` e `models/partida.py` seguem as propriedades e assinaturas deste documento. Em especial, confirmem a assinatura final de `Partida` e quem ficará responsável pelo repositório JSON. O Claude Code deve primeiro analisar o projeto existente e não sobrescrever código do colega.
