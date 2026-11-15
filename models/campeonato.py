@@ -95,3 +95,21 @@ class Campeonato:
             # Gira: a primeira fica fixa, a última vai para a posição 1
             times.insert(1, times.pop())
         return novas
+
+    def calcular_classificacao(self):
+        for equipe in self._equipes:
+            equipe.zerar_estatisticas()
+
+        for partida in self._partidas:
+            partida.aplicar_nas_equipes()
+
+        return sorted(
+            self._equipes, key=lambda equipe: (
+                -equipe.pontos,
+                -equipe.vitorias,
+                -equipe.saldo_gols,
+                -equipe.gols_pro,
+                equipe.nome.lower()
+            )
+        )
+
