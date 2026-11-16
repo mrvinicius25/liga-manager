@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 from tkinter import messagebox
@@ -28,6 +27,7 @@ class App(ctk.CTk):
         # Container onde todas as telas ficam empilhadas no mesmo lugar
         container = ctk.CTkFrame(self, fg_color="transparent")
         container.pack(fill="both", expand=True)
+        container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
 
         # Trocar cada TelaProvisoria pela tela real quando ela ficar pronta
@@ -51,7 +51,7 @@ class App(ctk.CTk):
             messagebox.showerror(
                 "Erro ao abrir dados",
                 f"{erro}\n\nO arquivo não foi alterado. Corrija-o ou apague-o "
-                "e abra o programa novamente"
+                "e abra o programa novamente."
             )
             self.destroy()
             sys.exit(1)
@@ -68,9 +68,10 @@ class App(ctk.CTk):
 
     def salvar_dados(self):
         try:
-            self.repositorio.salvar(self, self.campeonato)
+            self.repositorio.salvar(self.campeonato)
         except OSError as erro:
             messagebox.showerror("Erro ao salvar", f"Não foi possível salvar os dados.\n\n{erro}")
+
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")

@@ -1,5 +1,6 @@
 import customtkinter as ctk
 
+
 class TelaProvisoria(ctk.CTkFrame):
     """Tela temporária, usada até a tela real ficar pronta"""
 
