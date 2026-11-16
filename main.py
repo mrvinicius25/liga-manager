@@ -7,6 +7,7 @@ import customtkinter as ctk
 from models.campeonato import Campeonato
 from storage.repositorio_json import RepositorioJSON
 from views.inicio import TelaInicio
+from views.provisoria import TelaProvisoria
 
 # Caminho a partir da pasta deste arquivo: funciona mesmo se o programa
 # for aberto de outra pasta (ex.: python LigaManager/main.py)
@@ -33,9 +34,9 @@ class App(ctk.CTk):
         # Trocar cada TelaProvisoria pela tela real quando ela ficar pronta
         self.telas = {
             "inicio": TelaInicio(container, self),
-            "equipes": TelaInicio(container, self, "Equipes"),
-            "partidas": TelaInicio(container, self, "Partidas"),
-            "classificacao": TelaInicio(container, self, "Classificação"),
+            "equipes": TelaProvisoria(container, self, "Equipes"),
+            "partidas": TelaProvisoria(container, self, "Partidas"),
+            "classificacao": TelaProvisoria(container, self, "Classificação"),
         }
         for tela in self.telas.values():
             tela.grid(row=0, column=0, sticky="nsew")
