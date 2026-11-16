@@ -9,7 +9,7 @@ class TelaInicio(ctk.CTkFrame):
         self.app = app
 
         ctk.CTkLabel(self, text="LigaManager",
-                     font=ctk.CTkFont(size=28, weight="bold")).pack(pady(30,5))
+                     font=ctk.CTkFont(size=28, weight="bold")).pack(pady=(30,5))
 
         # Começa vazio: o texto é preenchido em atualizar()
         self.label_nome = ctk.CTkLabel(self, text="", font=ctk.CTkFont(size=18))
@@ -49,4 +49,3 @@ class TelaInicio(ctk.CTkFrame):
         self.valor_total.configure(text=str(campeonato.quantidade_partidas()))
         self.valor_realizadas.configure(text=str(campeonato.partidas_realizadas))
         self.valor_pendentes.configure(text=campeonato.partida_pendentes())
-        
