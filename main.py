@@ -62,7 +62,7 @@ class App(ctk.CTk):
             campeonato = Campeonato(NOME_PADRAO)
             self.repositorio.salvar(campeonato)
         return campeonato
-        
+
     def mostrar_tela(self, nome):
         tela = self.telas[nome]
         tela.atualizar()
