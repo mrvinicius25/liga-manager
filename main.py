@@ -74,6 +74,12 @@ class App(ctk.CTk):
         except OSError as erro:
             messagebox.showerror("Erro ao salvar", f"Não foi possível salvar os dados.\n\n{erro}")
 
+    def novo_campeonato(self):
+        """Descarta o campeonato atual e começa um novo, vazio."""
+        self.campeonato = Campeonato(NOME_PADRAO)
+        self.salvar_dados()
+        self.mostrar_tela("inicio")
+
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")

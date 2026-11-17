@@ -1,3 +1,5 @@
+from tkinter import messagebox
+
 import customtkinter as ctk
 
 
@@ -33,6 +35,11 @@ class TelaInicio(ctk.CTkFrame):
         ctk.CTkButton(botoes, text="Classificação",
                       command=lambda: self.app.mostrar_tela("classificacao")).pack(side="left", padx=8)
 
+        # Ação destrutiva: separada da navegação e em vermelho
+        ctk.CTkButton(self, text="Novo campeonato",
+                      fg_color="#a83232", hover_color="#7a2424",
+                      command=self.novo_campeonato).pack(pady=(0, 20))
+
     def _criar_cartao(self, grade, titulo, linha, coluna):
         """Cria um cartão com título e número; devolve o label do número."""
         cartao = ctk.CTkFrame(grade, corner_radius=12)
@@ -49,3 +56,16 @@ class TelaInicio(ctk.CTkFrame):
         self.valor_total.configure(text=str(campeonato.quantidade_partidas()))
         self.valor_realizadas.configure(text=str(campeonato.partidas_realizadas()))
         self.valor_pendentes.configure(text=str(campeonato.partidas_pendentes()))
+
+    def novo_campeonato(self):
+        confirmar = messagebox.askyesno(
+            "Novo campeonato",
+            "Isso apaga todas as equipes, partidas e resultados do campeonato atual.\n\n"
+            "Essa ação não pode ser desfeita. Deseja continuar?",
+            icon="warning",
+        )
+        if not confirmar:
+            return
+
+        self.app.novo_campeonato()
+        messagebox.showinfo("Novo campeonato", "Um novo campeonato foi criado.")
