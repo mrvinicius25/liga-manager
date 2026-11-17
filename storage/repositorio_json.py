@@ -28,7 +28,7 @@ class RepositorioJSON:
         self._caminho.parent.mkdir(parents=True, exist_ok=True)
 
         with open(self._caminho, "w", encoding="utf-8") as arquivo:
-            # ensure_ascii=False: grava "São Paulo" em vez de "São Paulo"
+            # ensure_ascii=False: grava "São Paulo" em vez de "S\u00e3o Paulo"
             json.dump(dados, arquivo, ensure_ascii=False, indent=2)
 
     def _campeonato_para_dicionario(self, campeonato):
